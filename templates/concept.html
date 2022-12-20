@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<tit>LyrAIX</tit>
+
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <h1>Brief</h1>
+    <div>
+      <p>Lets create a mood-board for your brand</p>
+    </div>
+    <h2>Photos describing concept - {{ concept }}</h2>
+
+    <div>
+      {% for photo in photos %}
+        <img src="{{ photo }}" alt="Italian Trulli">
+      {% endfor %}
+    </div>
+
+
+
+</div>
+
+{% endblock %}
