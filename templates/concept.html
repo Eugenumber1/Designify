@@ -15,7 +15,7 @@
 
     <div>
       {% for photo in photos %}
-        <img src="{{ photo }}" alt="Italian Trulli">
+        <img src="{{ photo }}" alt="photo of the concept" id="photo-number-{{photos.index(photo)}}">
       {% endfor %}
     </div>
 
