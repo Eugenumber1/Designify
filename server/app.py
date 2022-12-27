@@ -1,6 +1,7 @@
-from flask import Flask, url_for, request, redirect
+from flask import Flask, url_for, request, redirect, jsonify
 from flask import render_template
 from pyunsplash import PyUnsplash
+from flask_cors import CORS
 
 
 from datetime import datetime
@@ -16,6 +17,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'you-will-never-guess'
 api_key = 'mJpXOSabo4pvepg4JaPEOMhBWUxmS86hQIvueQQezx4'
 py_un = PyUnsplash(api_key=api_key)
+CORS(app, resources={r'/*': {'origins': '*'}})
 
 
 
@@ -44,6 +46,10 @@ def home():
 @app.route('/concept', methods=['POST', 'GET'])  # url for my app
 def concept(concept, photos):
     pass
+
+@app.route('/ping', methods=['GET'])
+def ping_pong():
+    return jsonify('pong!')
 
 
 
