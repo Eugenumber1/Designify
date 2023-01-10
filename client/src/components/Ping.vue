@@ -19,6 +19,7 @@ export default {
       const path = 'http://localhost:5000/ping';
       axios.get(path)
         .then((res) => {
+          console.log(res.data);
           this.msg = res.data;
         })
         .catch((error) => {
