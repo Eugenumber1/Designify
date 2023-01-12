@@ -1,37 +1,47 @@
 <template>
-  <div class="container">
-    <div class="row">
-      <div class="col-sm-10">
-        <h1>Books</h1>
-        <hr><br><br>
-        <button type="button" class="btn btn-success btn-sm">Add Book</button>
-        <br><br>
-        <table class="table table-hover">
-          <thead>
+  <div class="jumbotron vertical-center">
+    <div class="container">
+      <!-- bootswatch cdn -->
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@4.5.2/dist/materia/bootstrap.min.css" integrity="sha384-B4morbeopVCSpzeC1c4nyV0d0cqvlSAfyXVfrPJa25im5p+yEN/YmhlgQP/OyMZD" crossorigin="anonymous">
+
+      <div class="row">
+        <h1>Describe your Brand</h1>
+        <div class="col-lg-10">
+          <hr><br>
+          <!-- Alert message -->
+          <input v-model.trim="word" type="text" id="word-concept"/>
+          <button type="button" class="btn btn-success btn-sm">Tell us the Concept!</button>
+          <br><br>
+          <table class="table table-hover">
+            <thead>
             <tr>
-              <th scope="col">Title</th>
-              <th scope="col">Author</th>
-              <th scope="col">Read?</th>
-              <th></th>
+              <th scope="col">ID</th>
+              <th scope="col">Concept</th>
+              <th scope="col">Photo</th>
+              <th scope="col">Weight</th>
             </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(book, index) in books" :key="index">
-              <td>{{ book.title }}</td>
-              <td>{{ book.author }}</td>
-              <td>
-                <span v-if="book.read">Yes</span>
-                <span v-else>No</span>
-              </td>
-              <td>
-                <div class="btn-group" role="group">
-                  <button type="button" class="btn btn-warning btn-sm">Update</button>
-                  <button type="button" class="btn btn-danger btn-sm">Delete</button>
-                </div>
-              </td>
+            </thead>
+            <tbody>
+              <tr v-for="(photo, index) in photos" :key="index">
+                <td>{{ photo.id }}</td>
+                <td>{{ photo.word }}</td>
+                <td>
+                  <img :src="photo.url[0]" alt="photo" width="100" height="100">
+                </td>
+                <td>
+                  <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-info btn-sm">Add</button>
+                    <button type="button" class="btn btn-danger btn-sm">Reduce</button>
+                  </div>
+                </td>
             </tr>
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+
+          <div v-for="(photo, index) in photos" :key="index">
+            <img v-bind:src="`${photo.url}`" alt="photo" width="100" height="100">
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -43,24 +53,23 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      books: [],
+      photos: [],
     };
   },
   methods: {
-    getBooks() {
-      const path = 'http://localhost:5000/books';
+    getPhotos() {
+      const path = 'http://localhost:5000/photos';
       axios.get(path)
         .then((res) => {
-          this.books = res.data.books;
+          this.photos = res.data.photos;
         })
-        .catch((error) => {
-          // eslint-disable-next-line
-          console.error(error);
+        .catch((err) => {
+          console.error(err);
         });
     },
   },
   created() {
-    this.getBooks();
+    this.getPhotos();
   },
 };
 </script>

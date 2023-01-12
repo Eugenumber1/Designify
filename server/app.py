@@ -42,6 +42,19 @@ BOOKS = [
     }
 ]
 
+PHOTOS = [
+    {
+        'id': uuid.uuid4().hex,
+        'word': 'Tadj Mahal',
+        'url': ['https://unsplash.com/photos/S34fEzWT6eE/download?ixid=MnwzOTEwNTZ8MXwxfHNlYXJjaHwxfHxpbm5vdmF0aW9ufGVufDB8fHx8MTY3MzUyNjg5Mg']
+    },
+    {
+        'id': uuid.uuid4().hex,
+        'word': 'Something Else',
+        'url': ['https://unsplash.com/photos/G7VN8NadjO0/download?ixid=MnwzOTEwNTZ8MHwxfHNlYXJjaHw3fHxpbm5vdmF0aW9ufGVufDB8fHx8MTY3MzUyNjg5Mg']
+    }
+]
+
 # --------------- API -------------------
 
 @app.route('/books', methods=['GET', 'POST'])
@@ -94,7 +107,7 @@ def remove_book(book_id):
 def ping_pong():
     return jsonify('Damn I did it')
 
-@app.route('/', methods=['POST', 'GET'])  # url for my app
+@app.route('/photos', methods=['POST', 'GET'])  # url for my app
 def home():
     response_object = {'status': 'success'}
     if request.method == "POST":
@@ -107,9 +120,15 @@ def home():
             photos.append(entry.link_download)
             print(entry.link_download)
         print(len(photos))
+
         response_object['photos'] = photos
+        print(response_object)
         return jsonify(response_object)
-    return jsonify(response_object)
+    response_object['photos'] = PHOTOS
+    return jsonify({
+        'photos': PHOTOS,
+        'status': 'success'
+    })
 
 
 # @app.route('/concept', methods=['POST', 'GET'])  # url for my app

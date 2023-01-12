@@ -14,7 +14,7 @@ py_un = PyUnsplash(api_key=api_key)
 search = py_un.search(type_='photos', query='innovation')
 #print(len(search.entries))
 for entry in search.entries:
-    print(entry.link_html)
+    print(entry.link_download)
 
 # Start with the generic collection, maximize number of items
 # note: this will run until all photos of all collections have
