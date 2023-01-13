@@ -14,6 +14,8 @@
           <button type="button" class="btn btn-success btn-sm" v-b-modal.word-modal>
             Tell us the Concept!</button>
           <br><br>
+          <div  v-for="(photo, index) in photos" :key="index">
+            <h2>The Word with which you associate your brand is: {{ photo.word }}</h2>
           <table class="table table-hover">
             <thead>
             <tr>
@@ -24,11 +26,11 @@
             </tr>
             </thead>
             <tbody>
-              <tr v-for="(photo, index) in photos" :key="index">
+              <tr v-for="pic in photo.url" :key="pic">
                 <td>{{ photo.id }}</td>
                 <td>{{ photo.word }}</td>
                 <td>
-                  <img :src="photo.url[0]" alt="photo" width="100" height="100">
+                  <img :src="pic" alt="photo" width="600" height="600">
                 </td>
                 <td>
                   <div class="btn-group" role="group">
@@ -39,7 +41,7 @@
             </tr>
             </tbody>
           </table>
-
+          </div>
           <div v-for="(photo, index) in photos" :key="index">
             <img v-bind:src="`${photo.url}`" alt="photo" width="100" height="100">
           </div>
@@ -62,10 +64,9 @@
           </b-form-input>
         </b-form-group>
         <b-button-group>
-          <b-button @click="$bvModal.hide('word-modal')" type="submit" variant="primary">
+          <b-button type="submit" variant="primary">
             Submit
           </b-button>
-          <b-button @click="$bvModal.hide('word-modal')" variant="secondary">Close</b-button>
         </b-button-group>
       </b-form>
     </b-modal>

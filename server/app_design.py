@@ -23,16 +23,16 @@ CORS(app, resources={r'/*': {'origins': '*'}})
 # ------------RESOURCES------------
 
 PHOTOS = [
-    {
-        'id': uuid.uuid4().hex,
-        'word': 'Tadj Mahal',
-        'url': ['https://unsplash.com/photos/S34fEzWT6eE/download?ixid=MnwzOTEwNTZ8MXwxfHNlYXJjaHwxfHxpbm5vdmF0aW9ufGVufDB8fHx8MTY3MzUyNjg5Mg']
-    },
-    {
-        'id': uuid.uuid4().hex,
-        'word': 'Something Else',
-        'url': ['https://unsplash.com/photos/G7VN8NadjO0/download?ixid=MnwzOTEwNTZ8MHwxfHNlYXJjaHw3fHxpbm5vdmF0aW9ufGVufDB8fHx8MTY3MzUyNjg5Mg']
-    }
+    # {
+    #     'id': uuid.uuid4().hex,
+    #     'word': 'Tadj Mahal',
+    #     'url': ['https://unsplash.com/photos/S34fEzWT6eE/download?ixid=MnwzOTEwNTZ8MXwxfHNlYXJjaHwxfHxpbm5vdmF0aW9ufGVufDB8fHx8MTY3MzUyNjg5Mg']
+    # },
+    # {
+    #     'id': uuid.uuid4().hex,
+    #     'word': 'Something Else',
+    #     'url': ['https://unsplash.com/photos/G7VN8NadjO0/download?ixid=MnwzOTEwNTZ8MHwxfHNlYXJjaHw3fHxpbm5vdmF0aW9ufGVufDB8fHx8MTY3MzUyNjg5Mg']
+    # }
 ]
 
 # --------------- API -------------------
@@ -49,7 +49,7 @@ def home():
     if request.method == "POST":
         post_data = request.get_json()
         word = post_data.get('word')
-        search = py_un.search(type_='photos', per_page=50, query=word)
+        search = py_un.search(type_='photos', per_page=100, query=word)
         photos = list()
         #print(type(search))
         for entry in search.entries:
