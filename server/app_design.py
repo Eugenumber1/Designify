@@ -49,7 +49,7 @@ def home():
     if request.method == "POST":
         post_data = request.get_json()
         word = post_data.get('word')
-        search = py_un.search(type_='photos', per_page=100, query=word)
+        search = py_un.search(type_='photos', per_page=50, query=word)
         photos = list()
         #print(type(search))
         for entry in search.entries:
@@ -60,7 +60,10 @@ def home():
         photo_object['id'] = uuid.uuid4().hex
         photo_object['word'] = word
         #print(photo_object['word'])
-        photo_object['url'] = photos
+        photo_object['url'] = dict()
+        parameter = 3
+        for photo in photos:
+            photo_object['url'][uuid.uuid4().hex] = (photo, parameter)
         response_object['photos'] = photo_object
         PHOTOS.append(photo_object)
         response_object['message'] = 'Photo added!'
@@ -70,7 +73,29 @@ def home():
         response_object['photos'] = PHOTOS
         return jsonify(response_object)
 
+@app.route('/photo/<photo_object_id>/<photo_id>', methods=['PUT', 'DELETE'])
+def single_photo(photo_object_id, photo_id):
+    response_object = {'status': 'success'}
+    if request.method == 'PUT':
+        post_data = request.get_json()
+        remove_photo(photo_object_id, photo_id)
+        PHOTOS.append({
+            'id': uuid.uuid4().hex,
+            'word': post_data.get('word'),
+            'url': post_data.get('url')
+        })
+        response_object['message'] = 'Weight was updated!'
+    return jsonify(response_object)
 
+
+# remove photo
+def remove_photo(photo_object_id, photo_id):
+    for photo_object in PHOTOS:
+        if photo_object['id'] == photo_object_id:
+            if photo_object['url'][photo_id]:
+                photo_object['url'].pop(photo_id, 'No such Photo was found')
+                return True
+    return False
 
 # @app.route('/concept', methods=['POST', 'GET'])  # url for my app
 # def concept(concept, photos):

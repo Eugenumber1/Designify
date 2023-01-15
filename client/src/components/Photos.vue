@@ -11,6 +11,7 @@
         <div class="col-lg-10">
           <hr><br>
           <!-- Alert message -->
+          <b-alert variant="success" v-if="showMessage" show> {{ message }} </b-alert>
           <button type="button" class="btn btn-success btn-sm" v-b-modal.word-modal>
             Tell us the Concept!</button>
           <br><br>
@@ -26,15 +27,17 @@
             </tr>
             </thead>
             <tbody>
-              <tr v-for="pic in photo.url" :key="pic">
-                <td>{{ photo.id }}</td>
+              <tr v-for="(pic, index) in photo.url" :key="index">
+                <td>{{ index }}</td>
                 <td>{{ photo.word }}</td>
                 <td>
-                  <img :src="pic" alt="photo" width="600" height="600">
+                  <img :src="pic[0]" alt="photo" width="600" height="600">
+                  <p>{{ pic[1] }}</p>
                 </td>
                 <td>
                   <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-info btn-sm">Add</button>
+                    <button type="button" class="btn btn-info btn-sm" v-b-modal.weight-modal
+                    @click="editWeight(weight)">Edit Weight</button>
                     <button type="button" class="btn btn-danger btn-sm">Reduce</button>
                   </div>
                 </td>
@@ -70,6 +73,30 @@
         </b-button-group>
       </b-form>
     </b-modal>
+      <!-- Modal 2 -->
+      <b-modal ref="editWeightModal"
+                   id="weight-modal"
+                   title="Update the Weight"
+                   hide-footer hide-backdrop>
+      <b-form @submit="onSubmitUpdate" class="w-100">
+      <b-form-group id="form-weight-edit-group"
+                    label="Title:"
+                    label-for="form-weight-edit-input">
+          <b-form-input id="form-weight-input"
+                        type="text"
+                        v-model="editForm.weight"
+                        required
+                        placeholder="Enter the Weight from 1 to 5">
+          </b-form-input>
+        </b-form-group>
+        <b-button-group>
+          <b-button type="submit" variant="primary">
+            Submit
+          </b-button>
+        </b-button-group>
+      </b-form>
+    </b-modal>
+      <!-- Modal 2 end -->
     </div>
   </div>
 </template>
@@ -85,8 +112,14 @@ export default {
       addWordForm: {
         word: '',
       },
+      editForm: {
+        photo_object_id: '',
+        photo_id: '',
+        weight: 0,
+      },
     };
   },
+  message: '',
   components: {
     BModal,
   },
@@ -108,6 +141,8 @@ export default {
       axios.post(path, payLoad)
         .then(() => {
           this.getPhotos();
+          this.message = 'You are looking for a new word!';
+          this.showMessage = true;
         })
         .catch((err) => {
           console.error(err);
@@ -125,6 +160,31 @@ export default {
       this.postWord(payLoad);
       this.initForm();
     },
+    onSubmitUpdate(evt) {
+      evt.preventDefault();
+      this.$bvModal.hide('word-modal');
+      const payLoad = {
+        weight: this.editForm.weight,
+      };
+      this.updatePhoto(payLoad, this.editForm.photo_object_id, this.editForm.photo_id);
+    },
+    updatePhoto(payLoad, photo_object_id, photo_id) {
+      const path = `http://localhost:5000/photos${photo_object_id}/${photo_id}`;
+      axios.get(path)
+        .then((res) => {
+          this.photos = res.data.photos;
+          this.message = 'Photo Weight Updated!';
+          this.showMessage = true;
+        })
+        .catch((err) => {
+          console.error(err);
+          this.getPhotos();
+        });
+    },
+    // Handle update button
+    editWeight(weight){
+      this.editForm = photo
+    }
   },
   created() {
     this.getPhotos();
