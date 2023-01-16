@@ -15,8 +15,8 @@
           <button type="button" class="btn btn-success btn-sm" v-b-modal.word-modal>
             Tell us the Concept!</button>
           <br><br>
-          <div  v-for="(photo, index) in photos" :key="index">
-            <h2>The Word with which you associate your brand is: {{ photo.word }}</h2>
+          <div  v-for="(photo_object, index_object) in photos" :key="index_object">
+            <h2>The Word with which you associate your brand is: {{ photo_object.word }}</h2>
           <table class="table table-hover">
             <thead>
             <tr>
@@ -27,17 +27,17 @@
             </tr>
             </thead>
             <tbody>
-              <tr v-for="(pic, index) in photo.url" :key="index">
-                <td>{{ index }}</td>
-                <td>{{ photo.word }}</td>
+              <tr v-for="(photo, index_photo) in photo_object.url" :key="index_photo">
+                <td>{{ index_photo }}</td>
+                <td>{{ photo_object.word }}</td>
                 <td>
-                  <img :src="pic[0]" alt="photo" width="600" height="600">
-                  <p>{{ pic[1] }}</p>
+                  <img :src="photo[0]" alt="photo" width="600" height="600">
+                  <p>{{ photo[1] }}</p>
                 </td>
                 <td>
                   <div class="btn-group" role="group">
                     <button type="button" class="btn btn-info btn-sm" v-b-modal.weight-modal
-                    @click="editWeight(weight)">Edit Weight</button>
+                    @click="editWeight(photo_object.id, index_photo)">Edit Weight</button>
                     <button type="button" class="btn btn-danger btn-sm">Reduce</button>
                   </div>
                 </td>
@@ -150,6 +150,9 @@ export default {
     },
     initForm() {
       this.addWordForm.word = '';
+      this.editForm.photo_object_id = '';
+      this.editForm.photo_id = '';
+      this.editForm.weight = 0;
     },
     onSubmit(evt) {
       evt.preventDefault();
@@ -162,17 +165,17 @@ export default {
     },
     onSubmitUpdate(evt) {
       evt.preventDefault();
-      this.$bvModal.hide('word-modal');
+      this.$bvModal.hide('weight-modal');
       const payLoad = {
         weight: this.editForm.weight,
       };
       this.updatePhoto(payLoad, this.editForm.photo_object_id, this.editForm.photo_id);
     },
-    updatePhoto(payLoad, photo_object_id, photo_id) {
-      const path = `http://localhost:5000/photos${photo_object_id}/${photo_id}`;
-      axios.get(path)
-        .then((res) => {
-          this.photos = res.data.photos;
+    updatePhoto(payLoad, photoObjectId, photoId) {
+      const path = `http://localhost:5000/photos/${photoObjectId}/${photoId}`;
+      axios.put(path, payLoad)
+        .then(() => {
+          this.getPhotos();
           this.message = 'Photo Weight Updated!';
           this.showMessage = true;
         })
@@ -182,9 +185,10 @@ export default {
         });
     },
     // Handle update button
-    editWeight(weight){
-      this.editForm = photo
-    }
+    editWeight(photoObject, photoIndex) {
+      this.editForm.photo_object_id = photoObject;
+      this.editForm.photo_id = photoIndex;
+    },
   },
   created() {
     this.getPhotos();

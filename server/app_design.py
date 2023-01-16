@@ -63,7 +63,7 @@ def home():
         photo_object['url'] = dict()
         parameter = 3
         for photo in photos:
-            photo_object['url'][uuid.uuid4().hex] = (photo, parameter)
+            photo_object['url'][uuid.uuid4().hex] = [photo, parameter]
         response_object['photos'] = photo_object
         PHOTOS.append(photo_object)
         response_object['message'] = 'Photo added!'
@@ -73,28 +73,22 @@ def home():
         response_object['photos'] = PHOTOS
         return jsonify(response_object)
 
-@app.route('/photo/<photo_object_id>/<photo_id>', methods=['PUT', 'DELETE'])
+@app.route('/photos/<photo_object_id>/<photo_id>', methods=['PUT', 'DELETE'])
 def single_photo(photo_object_id, photo_id):
     response_object = {'status': 'success'}
     if request.method == 'PUT':
-        post_data = request.get_json()
-        remove_photo(photo_object_id, photo_id)
-        PHOTOS.append({
-            'id': uuid.uuid4().hex,
-            'word': post_data.get('word'),
-            'url': post_data.get('url')
-        })
-        response_object['message'] = 'Weight was updated!'
+        put_data = request.get_json()
+        if update_photo(photo_object_id, photo_id, put_data.get('weight')):
+            response_object['message'] = 'Weight was updated!'
     return jsonify(response_object)
 
 
 # remove photo
-def remove_photo(photo_object_id, photo_id):
+def update_photo(photo_object_id, photo_id, weight):
     for photo_object in PHOTOS:
         if photo_object['id'] == photo_object_id:
-            if photo_object['url'][photo_id]:
-                photo_object['url'].pop(photo_id, 'No such Photo was found')
-                return True
+            photo_object['url'][photo_id][1] = weight
+            return True
     return False
 
 # @app.route('/concept', methods=['POST', 'GET'])  # url for my app
