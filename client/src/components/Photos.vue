@@ -45,7 +45,8 @@
                   <div class="btn-group" role="group">
                     <button type="button" class="btn btn-info btn-sm" v-b-modal.weight-modal
                     @click="editWeight(photo_object.id, index_photo)">Edit Weight</button>
-                    <button type="button" class="btn btn-danger btn-sm">Reduce</button>
+                    <button type="button" class="btn btn-danger btn-sm"
+                            @click="deletePhoto(photo_object.id, index_photo)">Delete</button>
                   </div>
                 </td>
             </tr>
@@ -195,6 +196,23 @@ export default {
     editWeight(photoObject, photoIndex) {
       this.editForm.photo_object_id = photoObject;
       this.editForm.photo_id = photoIndex;
+    },
+    removePhoto(photoObjectId, photoId) {
+      const path = `http://localhost:5000/photos/${photoObjectId}/${photoId}`;
+      axios.delete(path)
+        .then(() => {
+          this.getPhotos();
+          this.message = 'Photo removed';
+          this.showMessage = true;
+        })
+        .catch((err) => {
+          console.error(err);
+          this.getPhotos();
+        });
+    },
+    // Handle delete button
+    deletePhoto(photoObjectId, photoId) {
+      this.removePhoto(photoObjectId, photoId);
     },
   },
   created() {

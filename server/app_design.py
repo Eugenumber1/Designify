@@ -80,14 +80,25 @@ def single_photo(photo_object_id, photo_id):
         put_data = request.get_json()
         if update_photo(photo_object_id, photo_id, put_data.get('weight')):
             response_object['message'] = 'Weight was updated!'
+    if request.method == 'DELETE':
+        if remove_photo(photo_object_id, photo_id):
+            response_object['message'] = 'Photo was deleted'
     return jsonify(response_object)
 
 
-# remove photo
+# update photo
 def update_photo(photo_object_id, photo_id, weight):
     for photo_object in PHOTOS:
         if photo_object['id'] == photo_object_id:
             photo_object['url'][photo_id][1] = weight
+            return True
+    return False
+
+# remove photo
+def remove_photo(photo_object_id, photo_id):
+    for photo_object in PHOTOS:
+        if photo_object['id'] == photo_object_id:
+            photo_object['url'].pop(photo_id)
             return True
     return False
 
