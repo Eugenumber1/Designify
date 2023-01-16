@@ -31,8 +31,15 @@
                 <td>{{ index_photo }}</td>
                 <td>{{ photo_object.word }}</td>
                 <td>
-                  <img :src="photo[0]" alt="photo" width="600" height="600">
-                  <p>{{ photo[1] }}</p>
+                  <div v-if="photo[1]===1">
+                    <img :src="photo[0]" alt="photo" width="100" height="100"></div>
+                  <div v-else-if="photo[1]===2">
+                    <img :src="photo[0]" alt="photo" width="200" height="200"></div>
+                  <div v-else-if="photo[1]===3">
+                    <img :src="photo[0]" alt="photo" width="300" height="300"></div>
+                  <div v-else-if="photo[1]===4">
+                    <img :src="photo[0]" alt="photo" width="400" height="400"></div>
+                  <div v-else><img :src="photo[0]" alt="photo" width="500" height="500"></div>
                 </td>
                 <td>
                   <div class="btn-group" role="group">
