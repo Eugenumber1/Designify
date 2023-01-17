@@ -3,6 +3,11 @@ from flask import Flask, url_for, request, redirect, jsonify
 from flask import render_template
 from pyunsplash import PyUnsplash
 from flask_cors import CORS
+from cavlib import CAV
+import urllib
+import os
+from pathlib import Path
+
 
 
 # configuration
@@ -90,7 +95,7 @@ def single_photo(photo_object_id, photo_id):
 def update_photo(photo_object_id, photo_id, weight):
     for photo_object in PHOTOS:
         if photo_object['id'] == photo_object_id:
-            photo_object['url'][photo_id][1] = weight
+            photo_object['url'][photo_id][1] = int(weight)
             return True
     return False
 
@@ -101,6 +106,39 @@ def remove_photo(photo_object_id, photo_id):
             photo_object['url'].pop(photo_id)
             return True
     return False
+
+@app.route('/concept/<photo_object_id>', methods=['POST', 'GET'])
+def get_concept(photo_object_id):
+    response_object = {'status': 'success'}
+    if request.method == 'POST':
+        for photo_object in PHOTOS:
+            if photo_object.get('id') == photo_object_id:
+                parent = '/Users/zhenyabudnyk/PycharmProjects/Designify/unsplash_pics'
+                directory = photo_object_id
+                path = os.path.join(parent, directory)
+                print(path)
+                os.mkdir(path)
+                for (key, value) in photo_object.get('url').items():
+                    download_image(value[0], path, key)
+                PHOTOS.remove(photo_object)
+        return jsonify(response_object)
+
+
+def download_image(url, file_path, file_name):
+    full_path = file_path + file_name + '.jpg'
+    urllib.urlretrieve(url, full_path)
+
+
+
+def create_cav(images_dir):
+    images_dir = Path('examples/images')
+    my_cav = CAV.load('examples/roundness.cav')
+
+    for image in images_dir.iterdir():
+        print(image.name, my_cav.score(image))
+
+
+
 
 # @app.route('/concept', methods=['POST', 'GET'])  # url for my app
 # def concept(concept, photos):

@@ -17,6 +17,13 @@
           <br><br>
           <div  v-for="(photo_object, index_object) in photos" :key="index_object">
             <h2>The Word with which you associate your brand is: {{ photo_object.word }}</h2>
+            <p> Change the weights of the photos or
+              delete those which don't visually fit into your concept </p>
+            <h3>When you are ready, and all
+              photos ideally describe your brand - submit them to our AI</h3>
+            <button type="button" class="btn btn-primary"
+                    @click="onSendConcept(photo_object.id)">
+            Submit Concept</button>
           <table class="table table-hover">
             <thead>
             <tr>
@@ -39,7 +46,9 @@
                     <img :src="photo[0]" alt="photo" width="300" height="300"></div>
                   <div v-else-if="photo[1]===4">
                     <img :src="photo[0]" alt="photo" width="400" height="400"></div>
-                  <div v-else><img :src="photo[0]" alt="photo" width="500" height="500"></div>
+                  <div v-else-if="photo[1]===5">
+                    <img :src="photo[0]" alt="photo" width="500" height="500"></div>
+                    <p>{{ photo[1] }}</p>
                 </td>
                 <td>
                   <div class="btn-group" role="group">
@@ -125,6 +134,9 @@ export default {
         photo_id: '',
         weight: 0,
       },
+      submitConceptForm: {
+        photo_object_id: '',
+      },
     };
   },
   message: '',
@@ -161,6 +173,7 @@ export default {
       this.editForm.photo_object_id = '';
       this.editForm.photo_id = '';
       this.editForm.weight = 0;
+      this.submitConceptForm.photo_object_id = '';
     },
     onSubmit(evt) {
       evt.preventDefault();
@@ -192,11 +205,37 @@ export default {
           this.getPhotos();
         });
     },
+    onSendConcept(evt, photoObjectId) {
+      evt.preventDefault();
+      this.submitConceptForm.photo_object_id = photoObjectId;
+      if (this.submitConceptForm.photo_object_id !== '') {
+        this.sendConcept(this.submitConceptForm.photo_object_id);
+      }
+    },
+    sendConcept(photoObjectId) {
+      const path = `http://localhost:5000/concept/${photoObjectId}`;
+      axios.post(path)
+        .then(() => {
+          this.getPhotos();
+          this.message = 'You just submitted your concept!';
+          this.showMessage = true;
+        })
+        .catch((err) => {
+          console.error(err);
+          this.getPhotos();
+        });
+    },
     // Handle update button
-    editWeight(photoObject, photoIndex) {
-      this.editForm.photo_object_id = photoObject;
+    editWeight(photoObjectId, photoIndex) {
+      this.editForm.photo_object_id = photoObjectId;
       this.editForm.photo_id = photoIndex;
     },
+    // handle submit button
+    retrieveConcept(photoObjectId) {
+      this.submitConceptForm.photo_object_id = photoObjectId;
+      console.log(photoObjectId);
+    },
+    // handle removal of the photos which don't fit
     removePhoto(photoObjectId, photoId) {
       const path = `http://localhost:5000/photos/${photoObjectId}/${photoId}`;
       axios.delete(path)
