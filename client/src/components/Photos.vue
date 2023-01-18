@@ -22,7 +22,7 @@
             <h3>When you are ready, and all
               photos ideally describe your brand - submit them to our AI</h3>
             <button type="button" class="btn btn-primary"
-                    @click="onSendConcept(photo_object.id)">
+                    @click="sendConcept(photo_object.id)">
             Submit Concept</button>
           <table class="table table-hover">
             <thead>
@@ -134,9 +134,9 @@ export default {
         photo_id: '',
         weight: 0,
       },
-      submitConceptForm: {
-        photo_object_id: '',
-      },
+      // submitConceptForm: {
+      //   photo_object_id: '',
+      // },
     };
   },
   message: '',
@@ -173,7 +173,7 @@ export default {
       this.editForm.photo_object_id = '';
       this.editForm.photo_id = '';
       this.editForm.weight = 0;
-      this.submitConceptForm.photo_object_id = '';
+      // this.submitConceptForm.photo_object_id = '';
     },
     onSubmit(evt) {
       evt.preventDefault();
@@ -205,15 +205,18 @@ export default {
           this.getPhotos();
         });
     },
-    onSendConcept(evt, photoObjectId) {
-      evt.preventDefault();
-      this.submitConceptForm.photo_object_id = photoObjectId;
-      if (this.submitConceptForm.photo_object_id !== '') {
-        this.sendConcept(this.submitConceptForm.photo_object_id);
-      }
-    },
+    // onSendConcept(evt) {
+    //   evt.preventDefault();
+    //   // this.submitConceptForm.photo_object_id = photoObjectId;
+    //   // if (this.submitConceptForm.photo_object_id !== '') {
+    //   //   this.sendConcept(this.submitConceptForm.photo_object_id);
+    //   // }
+    // },
     sendConcept(photoObjectId) {
       const path = `http://localhost:5000/concept/${photoObjectId}`;
+      // const payLoad = {
+      //   photoObjectId: this.submitConceptForm.photo_object_id,
+      // };
       axios.post(path)
         .then(() => {
           this.getPhotos();
@@ -231,10 +234,10 @@ export default {
       this.editForm.photo_id = photoIndex;
     },
     // handle submit button
-    retrieveConcept(photoObjectId) {
-      this.submitConceptForm.photo_object_id = photoObjectId;
-      console.log(photoObjectId);
-    },
+    // retrieveConcept(photoObjectId) {
+    //   this.submitConceptForm.photo_object_id = photoObjectId;
+    //   console.log(photoObjectId);
+    // },
     // handle removal of the photos which don't fit
     removePhoto(photoObjectId, photoId) {
       const path = `http://localhost:5000/photos/${photoObjectId}/${photoId}`;

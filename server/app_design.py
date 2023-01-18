@@ -4,9 +4,10 @@ from flask import render_template
 from pyunsplash import PyUnsplash
 from flask_cors import CORS
 from cavlib import CAV
-import urllib
+import urllib.request
 import os
 from pathlib import Path
+from tqdm import tqdm
 
 
 
@@ -54,7 +55,7 @@ def home():
     if request.method == "POST":
         post_data = request.get_json()
         word = post_data.get('word')
-        search = py_un.search(type_='photos', per_page=50, query=word)
+        search = py_un.search(type_='photos', per_page=5, query=word)
         photos = list()
         #print(type(search))
         for entry in search.entries:
@@ -107,7 +108,7 @@ def remove_photo(photo_object_id, photo_id):
             return True
     return False
 
-@app.route('/concept/<photo_object_id>', methods=['POST', 'GET'])
+@app.route('/concept/<photo_object_id>', methods=['POST'])
 def get_concept(photo_object_id):
     response_object = {'status': 'success'}
     if request.method == 'POST':
@@ -117,16 +118,17 @@ def get_concept(photo_object_id):
                 directory = photo_object_id
                 path = os.path.join(parent, directory)
                 print(path)
-                os.mkdir(path)
-                for (key, value) in photo_object.get('url').items():
-                    download_image(value[0], path, key)
+                os.makedirs(path, exist_ok=True)
+                print(path)
+                for (key, value) in tqdm(photo_object.get('url').items()):
+                     download_image(value[0], path, key)
                 PHOTOS.remove(photo_object)
-        return jsonify(response_object)
+    return jsonify(response_object)
 
 
 def download_image(url, file_path, file_name):
-    full_path = file_path + file_name + '.jpg'
-    urllib.urlretrieve(url, full_path)
+    full_path = file_path + '/' + file_name + '.jpg'
+    urllib.request.urlretrieve(url, full_path)
 
 
 
