@@ -3,6 +3,7 @@ import Router from 'vue-router';
 import Photos from '../components/Photos.vue';
 import Books from '../components/Books.vue';
 import Ping from '../components/Ping.vue';
+import ClientView from '../components/ClientView.vue';
 
 Vue.use(Router);
 
@@ -24,6 +25,11 @@ export default new Router({
       path: '/photos',
       name: 'Photos',
       component: Photos,
+    },
+    {
+      path: '/client',
+      name: 'Client',
+      component: ClientView,
     },
   ],
 });

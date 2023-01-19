@@ -108,8 +108,8 @@ def remove_photo(photo_object_id, photo_id):
             return True
     return False
 
-@app.route('/concept/<photo_object_id>', methods=['POST'])
-def get_concept(photo_object_id):
+@app.route('/concept/<photo_object_id>', methods=['POST', 'DELETE'])
+def concept(photo_object_id):
     response_object = {'status': 'success'}
     if request.method == 'POST':
         for photo_object in PHOTOS:
@@ -122,6 +122,10 @@ def get_concept(photo_object_id):
                 print(path)
                 for (key, value) in tqdm(photo_object.get('url').items()):
                      download_image(value[0], path, key)
+                PHOTOS.remove(photo_object)
+    if request.method == 'DELETE':
+        for photo_object in PHOTOS:
+            if photo_object.get('id') == photo_object_id:
                 PHOTOS.remove(photo_object)
     return jsonify(response_object)
 

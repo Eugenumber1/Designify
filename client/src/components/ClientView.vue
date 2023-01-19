@@ -3,15 +3,21 @@
     <div class="container">
       <!-- bootswatch cdn -->
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@4.5.2/dist/darkly/bootstrap.min.css" integrity="sha384-B4morbeopVCSpzeC1c4nyV0d0cqvlSAfyXVfrPJa25im5p+yEN/YmhlgQP/OyMZD" crossorigin="anonymous">
+      <link rel="stylesheet" href="../styles/styles.css" />
       <div class="row">
-        <h1 class="text-center bg-primary text-white">
+        <h1 class="text-center text-uppercase text-black">
           Describe your Brand
         </h1>
         <div class="col-lg-10">
           <hr><br>
           <!-- Alert message -->
           <b-alert variant="success" v-if="showMessage" show> {{ message }} </b-alert>
-          <button type="button" class="btn btn-success btn-sm" v-b-modal.word-modal>
+          <div class="text-md-left">
+          <h2>Process</h2>
+              <p>Tell us with which values you truly identify your brand with and our AI will create
+                several mood boards to help the designer better understand your brand.</p>
+            </div>
+          <button type="button" class="btn btn-primary btn-sm " v-b-modal.word-modal>
             Tell us the Concept!</button>
           <br><br>
           <div  v-for="(photo_object, index_object) in photos" :key="index_object">
@@ -23,6 +29,9 @@
             <button type="button" class="btn btn-primary"
                     @click="sendConcept(photo_object.id)">
             Submit Concept</button>
+            <button type="button" class="btn btn-danger"
+                    @click="resetConcept(photo_object.id)">
+            Reset Concept</button>
           <table class="table table-hover">
             <thead>
             <tr>
@@ -61,10 +70,16 @@
             </tbody>
           </table>
           </div>
-          <div v-for="(photo, index) in photos" :key="index">
-            <img v-bind:src="`${photo.url}`" alt="photo" width="100" height="100">
-          </div>
         </div>
+        <div class="image-cloud">
+        <div v-for="(photo_object, index) in photos" :key="index">
+            <div v-for="(photo, index_photo) in photo_object.url"
+                 :key="index_photo">
+                    <img :src="photo[0]" alt="photo"
+                         :style="{ width: photo[1]*100 + 'px', height: photo[1]*100 + 'px' }">
+            </div>
+          </div>
+          </div>
       </div>
       <!-- Modal -->
       <b-modal ref="addWordModal"
@@ -209,6 +224,19 @@ export default {
         .then(() => {
           this.getPhotos();
           this.message = 'You just submitted your concept!';
+          this.showMessage = true;
+        })
+        .catch((err) => {
+          console.error(err);
+          this.getPhotos();
+        });
+    },
+    resetConcept(photoObjectId) {
+      const path = `http://localhost:5000/concept/${photoObjectId}`;
+      axios.delete(path)
+        .then(() => {
+          this.getPhotos();
+          this.message = 'You just reset your concept, now you can try creating a new one!';
           this.showMessage = true;
         })
         .catch((err) => {
