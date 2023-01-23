@@ -23,6 +23,9 @@
             <button type="button" class="btn btn-primary"
                     @click="sendConcept(photo_object.id)">
             Submit Concept</button>
+            <button type="button" class="btn btn-danger"
+                    @click="resetConcept(photo_object.id)">
+            Reset Concept</button>
           <table class="table table-hover">
             <thead>
             <tr>
@@ -228,6 +231,19 @@ export default {
         .then(() => {
           this.getPhotos();
           this.message = 'Photo removed';
+          this.showMessage = true;
+        })
+        .catch((err) => {
+          console.error(err);
+          this.getPhotos();
+        });
+    },
+    resetConcept(photoObjectId) {
+      const path = `http://localhost:5000/concept/${photoObjectId}`;
+      axios.delete(path)
+        .then(() => {
+          this.getPhotos();
+          this.message = 'You just reset your concept, now you can try creating a new one!';
           this.showMessage = true;
         })
         .catch((err) => {

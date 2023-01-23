@@ -55,7 +55,7 @@ def home():
     if request.method == "POST":
         post_data = request.get_json()
         word = post_data.get('word')
-        search = py_un.search(type_='photos', per_page=5, query=word)
+        search = py_un.search(type_='photos', per_page=15, query=word)
         photos = list()
         #print(type(search))
         for entry in search.entries:

@@ -8,7 +8,7 @@
         <h1 class="text-center text-uppercase text-black">
           Describe your Brand
         </h1>
-        <div class="col-lg-10">
+        <div class="col-sm-12">
           <hr><br>
           <!-- Alert message -->
           <b-alert variant="success" v-if="showMessage" show> {{ message }} </b-alert>
@@ -32,6 +32,17 @@
             <button type="button" class="btn btn-danger"
                     @click="resetConcept(photo_object.id)">
             Reset Concept</button>
+            <div class="grid-container">
+          <div v-for="(photo_object, index) in photos" :key="index">
+            <div v-for="(photo, index_photo) in photo_object.url"
+                 :key="index_photo" class="grid-container">
+                    <img :src="photo[0]" alt="photo"
+                         :style="{ width: photo[1]*100 + 'px', height: photo[1]*100 + 'px' }"
+                         class="img-thumbnail">
+            </div>
+            </div>
+            </div>
+            <!--
           <table class="table table-hover">
             <thead>
             <tr>
@@ -69,16 +80,10 @@
             </tr>
             </tbody>
           </table>
+          -->
           </div>
         </div>
-        <div class="image-cloud">
-        <div v-for="(photo_object, index) in photos" :key="index">
-            <div v-for="(photo, index_photo) in photo_object.url"
-                 :key="index_photo">
-                    <img :src="photo[0]" alt="photo"
-                         :style="{ width: photo[1]*100 + 'px', height: photo[1]*100 + 'px' }">
-            </div>
-          </div>
+        <div>
           </div>
       </div>
       <!-- Modal -->
@@ -130,6 +135,7 @@
       <!-- Modal 2 end -->
     </div>
   </div>
+
 </template>
 
 <script>
@@ -273,3 +279,15 @@ export default {
   },
 };
 </script>
+<style>
+.image-cloud {
+  justify-content: center;
+}
+.grid-container {
+  display: inline-grid;
+  column-gap: 10px;
+  row-gap: 10px;
+  grid-template-columns: auto auto auto auto auto;
+  grid-template-rows: auto auto auto;
+}
+</style>
