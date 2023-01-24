@@ -1,31 +1,37 @@
 <template>
-  <div class="jumbotron vertical-center">
+  <div class="jumbotron">
     <div class="container">
       <!-- bootswatch cdn -->
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@4.5.2/dist/darkly/bootstrap.min.css" integrity="sha384-B4morbeopVCSpzeC1c4nyV0d0cqvlSAfyXVfrPJa25im5p+yEN/YmhlgQP/OyMZD" crossorigin="anonymous">
+      <!--<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@4.5.2/dist/darkly/bootstrap.min.css" integrity="sha384-B4morbeopVCSpzeC1c4nyV0d0cqvlSAfyXVfrPJa25im5p+yEN/YmhlgQP/OyMZD" crossorigin="anonymous">-->
       <div class="row">
-        <h1 class="text-center bg-primary text-white">
+        <h1 class="text-center text-uppercase text-black">
           Describe your Brand
         </h1>
-        <div class="col-lg-10">
+        <div class="col-sm-12">
           <hr><br>
           <!-- Alert message -->
           <b-alert variant="success" v-if="showMessage" show> {{ message }} </b-alert>
-          <button type="button" class="btn btn-success btn-sm" v-b-modal.word-modal>
+          <button type="button" class="btn btn-primary btn-sm " v-b-modal.word-modal>
             Tell us the Concept!</button>
           <br><br>
-          <div  v-for="(photo_object, index_object) in photos" :key="index_object">
+          <div v-for="(photo_object, index_object) in photos" :key="index_object">
             <h2>The Word with which you associate your brand is: {{ photo_object.word }}</h2>
-            <p> Change the weights of the photos or
-              delete those which don't visually fit into your concept </p>
-            <h3>When you are ready, and all
-              photos ideally describe your brand - submit them to our AI</h3>
             <button type="button" class="btn btn-primary"
                     @click="sendConcept(photo_object.id)">
             Submit Concept</button>
             <button type="button" class="btn btn-danger"
                     @click="resetConcept(photo_object.id)">
             Reset Concept</button>
+          <div v-for="(photo_object, index) in photos" :key="index">
+            <div v-for="(photo, index_photo) in photo_object.url"
+                 :key="index_photo" class="grid-container">
+                    <img :src="photo[0]"
+                         alt="photo"
+                         class="img-thumbnail"
+                         :style="imageStyles()">
+            </div>
+            </div>
+            <!--
           <table class="table table-hover">
             <thead>
             <tr>
@@ -45,7 +51,7 @@
                   <div v-else-if="photo[1]===2">
                     <img :src="photo[0]" alt="photo" width="200" height="200"></div>
                   <div v-else-if="photo[1]===3">
-                    <img :src="photo[0]" alt="photo" :style="imageStyles(photo[1])"></div>
+                    <img :src="photo[0]" alt="photo" width="300" height="300"></div>
                   <div v-else-if="photo[1]===4">
                     <img :src="photo[0]" alt="photo" width="400" height="400"></div>
                   <div v-else-if="photo[1]===5">
@@ -63,13 +69,13 @@
             </tr>
             </tbody>
           </table>
-          </div>
-          <div v-for="(photo, index) in photos" :key="index">
-            <img v-bind:src="`${photo.url}`" alt="photo" >
+          -->
           </div>
         </div>
+        <div>
+          </div>
       </div>
-      <!-- Modal -->
+      <!-- Modal 1-->
       <b-modal ref="addWordModal"
                    id="word-modal"
                    title="Add a new word"
@@ -118,6 +124,7 @@
       <!-- Modal 2 end -->
     </div>
   </div>
+
 </template>
 
 <script>
@@ -141,6 +148,7 @@ export default {
       // },
     };
   },
+  isHovered: false,
   message: '',
   components: {
     BModal,
@@ -219,6 +227,19 @@ export default {
           this.getPhotos();
         });
     },
+    resetConcept(photoObjectId) {
+      const path = `http://localhost:5000/concept/${photoObjectId}`;
+      axios.delete(path)
+        .then(() => {
+          this.getPhotos();
+          this.message = 'You just reset your concept, now you can try creating a new one!';
+          this.showMessage = true;
+        })
+        .catch((err) => {
+          console.error(err);
+          this.getPhotos();
+        });
+    },
     // Handle update button
     editWeight(photoObjectId, photoIndex) {
       this.editForm.photo_object_id = photoObjectId;
@@ -238,27 +259,22 @@ export default {
           this.getPhotos();
         });
     },
-    resetConcept(photoObjectId) {
-      const path = `http://localhost:5000/concept/${photoObjectId}`;
-      axios.delete(path)
-        .then(() => {
-          this.getPhotos();
-          this.message = 'You just reset your concept, now you can try creating a new one!';
-          this.showMessage = true;
-        })
-        .catch((err) => {
-          console.error(err);
-          this.getPhotos();
-        });
-    },
     // Handle delete button
     deletePhoto(photoObjectId, photoId) {
       this.removePhoto(photoObjectId, photoId);
     },
-    imageStyles(weight) {
+    // overPhoto(photoObject, index, indexPhoto) {
+    //
+    // },
+  },
+  created() {
+    this.getPhotos();
+  },
+  computed: {
+    imageStyles() {
       return {
-        width: `${weight}00px`,
-        height: `${weight}00px`,
+        width: '200px',
+        height: '200px',
         borderRadius: '10px',
         ...(this.isHovered ? {
           transform: 'scale(1.1)',
@@ -267,8 +283,20 @@ export default {
       };
     },
   },
-  created() {
-    this.getPhotos();
-  },
 };
 </script>
+<style>
+.picture {
+  margin: 5px;
+}
+.image-cloud {
+  justify-content: center;
+}
+.grid-container {
+  display: inline-grid;
+  column-gap: 5px;
+  row-gap: 5px;
+  grid-template-columns: auto auto auto auto auto;
+  grid-template-rows: auto auto auto;
+}
+</style>

@@ -3,7 +3,6 @@
     <div class="container">
       <!-- bootswatch cdn -->
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@4.5.2/dist/darkly/bootstrap.min.css" integrity="sha384-B4morbeopVCSpzeC1c4nyV0d0cqvlSAfyXVfrPJa25im5p+yEN/YmhlgQP/OyMZD" crossorigin="anonymous">
-      <link rel="stylesheet" href="../styles/styles.css" />
       <div class="row">
         <h1 class="text-center text-uppercase text-black">
           Describe your Brand
@@ -32,14 +31,17 @@
             <button type="button" class="btn btn-danger"
                     @click="resetConcept(photo_object.id)">
             Reset Concept</button>
-            <div class="grid-container">
           <div v-for="(photo_object, index) in photos" :key="index">
             <div v-for="(photo, index_photo) in photo_object.url"
                  :key="index_photo" class="grid-container">
-                    <img :src="photo[0]" alt="photo"
-                         :style="{ width: photo[1]*100 + 'px', height: photo[1]*100 + 'px' }"
-                         class="img-thumbnail">
-            </div>
+              <div class="picture">
+                    <img :src="photo[0]"
+                         alt="photo"
+                         class="img-thumbnail"
+                         :style="imageStyles(photos[1])"
+                    @mouseenter="isHovered = true"
+                    @mouseleave="isHovered = false">
+                </div>
             </div>
             </div>
             <!--
@@ -145,6 +147,7 @@ import { BModal } from 'bootstrap-vue';
 export default {
   data() {
     return {
+      isHovered: false,
       photos: [],
       addWordForm: {
         word: '',
@@ -273,6 +276,17 @@ export default {
     deletePhoto(photoObjectId, photoId) {
       this.removePhoto(photoObjectId, photoId);
     },
+    imageStyles(weight) {
+      return {
+        width: `${weight}00px`,
+        height: `${weight}00px`,
+        borderRadius: '10px',
+        ...(this.isHovered ? {
+          transform: 'scale(1.1)',
+          boxShadow: '5px 5px 10px #ccc',
+        } : {}),
+      };
+    },
   },
   created() {
     this.getPhotos();
@@ -280,13 +294,16 @@ export default {
 };
 </script>
 <style>
+.picture {
+  margin: 5px;
+}
 .image-cloud {
   justify-content: center;
 }
 .grid-container {
   display: inline-grid;
-  column-gap: 10px;
-  row-gap: 10px;
+  column-gap: 5px;
+  row-gap: 5px;
   grid-template-columns: auto auto auto auto auto;
   grid-template-rows: auto auto auto;
 }
