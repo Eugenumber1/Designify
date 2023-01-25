@@ -37,13 +37,19 @@
             class="grid-container">
               <div @mouseenter="isHovered = true; indexHovered=indexPhoto"
                     @mouseleave="isHovered = false">
+                <div class="picture">
                     <img :src="source"
                          alt="photo"
                          class="img-thumbnail grid-container"
                          :ref = "`img-${indexPhoto}`"
                          :style="imageStyles(weight, indexPhoto)">
-                         <!--:class="hoverClass(indexPhoto)"-->
-
+                <div v-if="isHovered" class="btn-group" role="group">
+                    <button type="button" class="btn btn-info btn-sm" v-b-modal.weight-modal
+                    @click="editWeight(photo_object.id, indexPhoto)">Edit Weight</button>
+                    <button type="button" class="btn btn-danger btn-sm"
+                            @click="deletePhoto(photo_object.id, indexPhoto)">Delete</button>
+                  </div>
+                  </div>
                 </div>
             </div>
             </div>
@@ -306,13 +312,15 @@ export default {
     // },
     imageStyles(weight, indexPhoto) {
       const styles = {
-        width: `${weight * 100}px`,
-        height: `${weight * 100}px`,
+        width: `${weight * 25 + 100}px`,
+        height: `${weight * 25 + 100}px`,
         borderRadius: '1px',
       };
       if (this.isHovered && this.indexHovered === indexPhoto) {
         styles.transform = 'scale(1.05)';
         styles.boxShadow = '5px 5px 10px #ccc';
+        styles.transition = 'all .5s ease';
+        // styles.vertical-align = 'middle';
       }
       return styles;
     },
@@ -348,5 +356,14 @@ export default {
   row-gap: 5px;
   grid-template-columns: auto auto auto auto auto;
   grid-template-rows: auto auto auto;
+}
+.left-button {
+    position: absolute;
+    left: 0;
+}
+
+.right-button {
+    position: absolute;
+    right: 0;
 }
 </style>
