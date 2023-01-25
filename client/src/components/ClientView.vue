@@ -31,16 +31,19 @@
             <button type="button" class="btn btn-danger"
                     @click="resetConcept(photo_object.id)">
             Reset Concept</button>
-          <div v-for="(photo_object, index) in photos" :key="index">
-            <div v-for="(photo, index_photo) in photo_object.url"
-                 :key="index_photo" class="grid-container">
-              <div class="picture">
-                    <img :src="photo[0]"
-                         alt="photo"
-                         class="img-thumbnail"
-                         :style="imageStyles(photos[1])"
-                    @mouseenter="isHovered = true"
+          <div v-for="(photoObject, index) in photos" :key="index">
+            <div v-for="([source, weight], indexPhoto) in photoObject.url"
+                 :key="indexPhoto"
+            class="grid-container">
+              <div @mouseenter="isHovered = true; indexHovered=indexPhoto"
                     @mouseleave="isHovered = false">
+                    <img :src="source"
+                         alt="photo"
+                         class="img-thumbnail grid-container"
+                         :ref = "`img-${indexPhoto}`"
+                         :style="imageStyles(weight, indexPhoto)">
+                         <!--:class="hoverClass(indexPhoto)"-->
+
                 </div>
             </div>
             </div>
@@ -148,6 +151,7 @@ export default {
   data() {
     return {
       isHovered: false,
+      indexHovered: '',
       photos: [],
       addWordForm: {
         word: '',
@@ -157,9 +161,6 @@ export default {
         photo_id: '',
         weight: 0,
       },
-      // submitConceptForm: {
-      //   photo_object_id: '',
-      // },
     };
   },
   message: '',
@@ -276,18 +277,59 @@ export default {
     deletePhoto(photoObjectId, photoId) {
       this.removePhoto(photoObjectId, photoId);
     },
-    imageStyles(weight) {
-      return {
-        width: `${weight}00px`,
-        height: `${weight}00px`,
-        borderRadius: '10px',
-        ...(this.isHovered ? {
-          transform: 'scale(1.1)',
-          boxShadow: '5px 5px 10px #ccc',
-        } : {}),
+    // making styles for each photo
+    // imageStyles(weight, index_photo) {
+    //   return {
+    //     width: `${weight * 100}px`,
+    //     height: `${weight * 100}px`,
+    //     borderRadius: '1px',
+    //     ...(this.isHovered ? {
+    //       transform: 'scale(1.05)',
+    //       boxShadow: '5px 5px 10px #ccc',
+    //     } : {}),
+    //   };
+    // },
+    // imageStyles(weight, indexPhoto) {
+    //   // this.$refs[`img-${indexPhoto}`].style.width = `${weight * 10}px`;
+    //   // this.$refs[`img-${indexPhoto}`].style.height = `${weight * 10}px`;
+    //   //console.log(indexPhoto);
+    //   //this.changeOnHover(indexPhoto);
+    //   return {
+    //     width: `${weight * 100}px`,
+    //     height: `${weight * 100}px`,
+    //     borderRadius: '1px',
+    //     ...if (this.isHovered && this.indexHovered === indexPhoto){
+    //       transform = 'scale(1.05)';
+    //       boxShadow = '5px 5px 10px #ccc';
+    //   }
+    //   };
+    // },
+    imageStyles(weight, indexPhoto) {
+      const styles = {
+        width: `${weight * 100}px`,
+        height: `${weight * 100}px`,
+        borderRadius: '1px',
       };
+      if (this.isHovered && this.indexHovered === indexPhoto) {
+        styles.transform = 'scale(1.05)';
+        styles.boxShadow = '5px 5px 10px #ccc';
+      }
+      return styles;
     },
+    // changeOnHover(indexPhoto) {
+    //   if (this.isHovered && this.indexHovered === indexPhoto) {
+    //     this.$refs[`img-${indexPhoto}`].style.transform = 'scale(1.05)';
+    //     this.$refs[`img-${indexPhoto}`].style.boxShadow = '5px 5px 10px #ccc';
+    //   }
+    // },
   },
+  // computed: {
+  //   hoverClass(indexPhoto) {
+  //     return {
+  //       hovered: this.isHovered && this.indexPhoto === indexPhoto,
+  //     };
+  //   },
+  // },
   created() {
     this.getPhotos();
   },
