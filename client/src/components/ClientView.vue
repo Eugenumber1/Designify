@@ -36,19 +36,22 @@
                  :key="indexPhoto"
             class="grid-container">
               <div @mouseenter="isHovered = true; indexHovered=indexPhoto"
-                    @mouseleave="isHovered = false">
-                <div class="picture">
+                    @mouseleave="isHovered = false; indexHovered=null">
+                <div class="picture" >
                     <img :src="source"
                          alt="photo"
                          class="img-thumbnail grid-container"
-                         :ref = "`img-${indexPhoto}`"
                          :style="imageStyles(weight, indexPhoto)">
-                <div v-if="isHovered" class="btn-group" role="group">
-                    <button type="button" class="btn btn-info btn-sm" v-b-modal.weight-modal
+                  <div class="left-side" @click="editWeight(photo_object.id, indexPhoto)"></div>
+                  <div class="right-side" @click="deletePhoto(photo_object.id, indexPhoto)"></div>
+                <!--<div v-if="activePhotoButtons === indexPhoto && isHovered===true"
+                     class="btn-group" role="group">
+                    <button type="button" class="btn btn-info btn-sm btn-left"
+                            v-b-modal.weight-modal
                     @click="editWeight(photo_object.id, indexPhoto)">Edit Weight</button>
-                    <button type="button" class="btn btn-danger btn-sm"
+                    <button type="button" class="btn btn-danger btn-sm btn-right"
                             @click="deletePhoto(photo_object.id, indexPhoto)">Delete</button>
-                  </div>
+                  </div>-->
                   </div>
                 </div>
             </div>
@@ -312,8 +315,8 @@ export default {
     // },
     imageStyles(weight, indexPhoto) {
       const styles = {
-        width: `${weight * 25 + 100}px`,
-        height: `${weight * 25 + 100}px`,
+        width: `${weight * 25 + 200}px`,
+        height: `${weight * 25 + 200}px`,
         borderRadius: '1px',
       };
       if (this.isHovered && this.indexHovered === indexPhoto) {
@@ -331,19 +334,41 @@ export default {
     //   }
     // },
   },
-  // computed: {
-  //   hoverClass(indexPhoto) {
-  //     return {
-  //       hovered: this.isHovered && this.indexPhoto === indexPhoto,
-  //     };
-  //   },
-  // },
+  computed: {
+    activePhotoButtons() {
+      return this.indexHovered;
+    },
+  },
   created() {
     this.getPhotos();
   },
 };
 </script>
 <style>
+.picture {
+    position: relative;
+  }
+
+  .btn-group {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .btn-left {
+    position:absolute;
+    left:0;
+  }
+
+  .btn-right {
+    position:absolute;
+    right:0;
+  }
 .picture {
   margin: 5px;
 }
@@ -365,5 +390,30 @@ export default {
 .right-button {
     position: absolute;
     right: 0;
+}
+.picture {
+    position: relative;
+}
+.btn-group {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+}
+.left-side, .right-side {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  transition: 0.3s ease-in-out;
+}
+
+.left-side {
+  left: 0;
+  background-color: #3498db;
+}
+
+.right-side {
+  right: 0;
+  background-color: #e74c3c;
 }
 </style>
