@@ -143,6 +143,13 @@ def create_cav(images_dir):
     for image in images_dir.iterdir():
         print(image.name, my_cav.score(image))
 
+@app.route('/designer/<photo_object_id>', methods=['GET', 'POST', 'DELETE'])
+def designerSide(photo_object_id):
+    pass
+
+
+
+
 
 
 

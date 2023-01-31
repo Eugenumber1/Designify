@@ -42,8 +42,12 @@
                          alt="photo"
                          class="img-thumbnail grid-container"
                          :style="imageStyles(weight, indexPhoto)">
-                  <div class="left-side" @click="editWeight(photo_object.id, indexPhoto)"></div>
-                  <div class="right-side" @click="deletePhoto(photo_object.id, indexPhoto)"></div>
+                  <div v-if="activePhotoButtons === indexPhoto && isHovered===true">
+                  <div class="left-side"
+                       @click="increaseWeight(photo_object.id, indexPhoto, weight)"></div>
+                  <div class="right-side"
+                       @click="decreaseWeight(photo_object.id, indexPhoto, weight)"></div>
+                    </div>
                 <!--<div v-if="activePhotoButtons === indexPhoto && isHovered===true"
                      class="btn-group" role="group">
                     <button type="button" class="btn btn-info btn-sm btn-left"
@@ -216,6 +220,24 @@ export default {
       this.postWord(payLoad);
       this.initForm();
     },
+    // Handle update button
+    editWeight(photoObjectId, photoIndex) {
+      this.editForm.photo_object_id = photoObjectId;
+      this.editForm.photo_id = photoIndex;
+    },
+    decreaseWeight(photoObjectId, indexPhoto, weight) {
+      const payload = {
+        weight: weight - 1,
+      };
+      this.updatePhoto(payload, photoObjectId, indexPhoto);
+    },
+    increaseWeight(photoObjectId, indexPhoto, weight) {
+      const payload = {
+        weight: weight + 1,
+      };
+      this.updatePhoto(payload, photoObjectId, indexPhoto);
+    },
+
     onSubmitUpdate(evt) {
       evt.preventDefault();
       this.$bvModal.hide('weight-modal');
@@ -263,11 +285,7 @@ export default {
           this.getPhotos();
         });
     },
-    // Handle update button
-    editWeight(photoObjectId, photoIndex) {
-      this.editForm.photo_object_id = photoObjectId;
-      this.editForm.photo_id = photoIndex;
-    },
+
     // handle removal of the photos which don't fit
     removePhoto(photoObjectId, photoId) {
       const path = `http://localhost:5000/photos/${photoObjectId}/${photoId}`;
@@ -409,11 +427,9 @@ export default {
 
 .left-side {
   left: 0;
-  background-color: #3498db;
 }
 
 .right-side {
   right: 0;
-  background-color: #e74c3c;
 }
 </style>
