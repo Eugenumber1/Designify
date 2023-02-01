@@ -40,6 +40,7 @@ PHOTOS = [
     #     'url': ['https://unsplash.com/photos/G7VN8NadjO0/download?ixid=MnwzOTEwNTZ8MHwxfHNlYXJjaHw3fHxpbm5vdmF0aW9ufGVufDB8fHx8MTY3MzUyNjg5Mg']
     # }
 ]
+NEGATIVES = []
 
 # --------------- API -------------------
 
@@ -70,13 +71,13 @@ def home():
         parameter = 3
         for photo in photos:
             photo_object['url'][uuid.uuid4().hex] = [photo, parameter]
-        response_object['photos'] = photo_object
+        response_object['photosPositive'] = photo_object
         PHOTOS.append(photo_object)
         response_object['message'] = 'Photo added!'
         print(response_object)
         return jsonify(response_object)
     else:
-        response_object['photos'] = PHOTOS
+        response_object['photosPositive'] = PHOTOS
         return jsonify(response_object)
 
 @app.route('/photos/<photo_object_id>/<photo_id>', methods=['PUT', 'DELETE'])

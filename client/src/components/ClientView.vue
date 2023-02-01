@@ -20,7 +20,7 @@
           <button type="button" class="btn btn-primary btn-sm " v-b-modal.word-modal>
             Tell us the Concept!</button>
           <br><br>
-          <div  v-for="(photo_object, index_object) in photos" :key="index_object">
+          <div  v-for="(photo_object, index_object) in photosPositive" :key="index_object">
             <h2>The Word with which you associate your brand is: {{ photo_object.word }}</h2>
             <p> Change the weights of the photos or
               delete those which don't visually fit into your concept </p>
@@ -32,7 +32,7 @@
             <button type="button" class="btn btn-danger"
                     @click="resetConcept(photo_object.id)">
             Reset Concept</button>
-          <div v-for="(photoObject, index) in photos" :key="index">
+          <div v-for="(photoObject, index) in photosPositive" :key="index">
             <div v-for="([source, weight], indexPhoto) in photoObject.url"
                  :key="indexPhoto"
             class="grid-container">
@@ -63,6 +63,35 @@
                     <button type="button" class="btn btn-danger btn-sm btn-right"
                             @click="deletePhoto(photo_object.id, indexPhoto)">Delete</button>
                   </div>-->
+                  </div>
+                </div>
+            </div>
+            </div>
+            <!--Here we have the photos with which the user doesn't associate his
+            brand, mostly random ones -->
+            <div v-for="(photoObject, index) in photosNegative" :key="index">
+            <div v-for="([source, weight], indexPhoto) in photoObject.url"
+                 :key="indexPhoto"
+            class="grid-container">
+              <div @mouseenter="isHovered = true; indexHovered=indexPhoto"
+                    @mouseleave="isHovered = false; indexHovered=null">
+                <div class="picture" >
+                    <img :src="source"
+                         alt="photo"
+                         class="img-thumbnail grid-container"
+                         :style="imageStyles(weight, indexPhoto)">
+                  <div v-if="activePhotoButtons === indexPhoto && isHovered===true">
+                  <div class="left-side"
+                       @click="increaseWeight(photo_object.id, indexPhoto, weight)"></div>
+                  <div class="right-side"
+                       @click="decreaseWeight(photo_object.id, indexPhoto, weight)"></div>
+                    <div class="delete-button">
+                      <button @click="deletePhoto(photo_object.id, indexPhoto)" type="button"
+                              class="btn btn-danger btn-sm float-right">
+                              <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                    </div>
                   </div>
                 </div>
             </div>
@@ -172,7 +201,8 @@ export default {
     return {
       isHovered: false,
       indexHovered: '',
-      photos: [],
+      photosPositive: [],
+      photosNegative: [],
       addWordForm: {
         word: '',
       },
@@ -193,7 +223,7 @@ export default {
       const path = 'http://localhost:5000/photos';
       axios.get(path)
         .then((res) => {
-          this.photos = res.data.photos;
+          this.photosPositive = res.data.photosPositive;
         })
         .catch((err) => {
           console.error(err);
