@@ -20,20 +20,22 @@
           <button type="button" class="btn btn-primary btn-sm " v-b-modal.word-modal>
             Tell us the Concept!</button>
           <br><br>
-          <div  v-for="(photo_object, index_object) in photosPositive" :key="index_object">
-            <h2>The Word with which you associate your brand is: {{ photo_object.word }}</h2>
+          <div class="one-concept">
+          <div  v-for="(concept, index_object) in concepts" :key="index_object">
+            <h2>The Word with which you associate your brand is: {{ concept.word }}</h2>
             <p> Change the weights of the photos or
               delete those which don't visually fit into your concept </p>
             <h3>When you are ready, and all
               photos ideally describe your brand - submit them to our AI</h3>
             <button type="button" class="btn btn-primary"
-                    @click="sendConcept(photo_object.id)">
+                    @click="sendConcept(concept.id)">
             Submit Concept</button>
             <button type="button" class="btn btn-danger"
-                    @click="resetConcept(photo_object.id)">
+                    @click="resetConcept(concept.id)">
             Reset Concept</button>
-          <div v-for="(photoObject, index) in photosPositive" :key="index">
-            <div v-for="([source, weight], indexPhoto) in photoObject.url"
+          <div v-for="(concept, index) in concepts" :key="index">
+            <div class="photo-clusters">
+            <div v-for="([source, weight], indexPhoto) in concept.url_positive"
                  :key="indexPhoto"
             class="grid-container">
               <div @mouseenter="isHovered = true; indexHovered=indexPhoto"
@@ -45,32 +47,23 @@
                          :style="imageStyles(weight, indexPhoto)">
                   <div v-if="activePhotoButtons === indexPhoto && isHovered===true">
                   <div class="left-side"
-                       @click="increaseWeight(photo_object.id, indexPhoto, weight)"></div>
+                       @click="increaseWeight(concept.id, indexPhoto, weight)"></div>
                   <div class="right-side"
-                       @click="decreaseWeight(photo_object.id, indexPhoto, weight)"></div>
+                       @click="decreaseWeight(concept.id, indexPhoto, weight)"></div>
                     <div class="delete-button">
-                      <button @click="deletePhoto(photo_object.id, indexPhoto)" type="button"
+                      <button @click="deletePhoto(concept.id, indexPhoto)" type="button"
                               class="btn btn-danger btn-sm float-right">
                               <i class="fas fa-times"></i>
                       </button>
                     </div>
                     </div>
-                <!--<div v-if="activePhotoButtons === indexPhoto && isHovered===true"
-                     class="btn-group" role="group">
-                    <button type="button" class="btn btn-info btn-sm btn-left"
-                            v-b-modal.weight-modal
-                    @click="editWeight(photo_object.id, indexPhoto)">Edit Weight</button>
-                    <button type="button" class="btn btn-danger btn-sm btn-right"
-                            @click="deletePhoto(photo_object.id, indexPhoto)">Delete</button>
-                  </div>-->
                   </div>
                 </div>
-            </div>
             </div>
             <!--Here we have the photos with which the user doesn't associate his
             brand, mostly random ones -->
-            <div v-for="(photoObject, index) in photosNegative" :key="index">
-            <div v-for="([source, weight], indexPhoto) in photoObject.url"
+              <h2>Photos with Which you don't associate your brand!</h2>
+            <div v-for="([source, weight], indexPhoto) in concept.url_negative"
                  :key="indexPhoto"
             class="grid-container">
               <div @mouseenter="isHovered = true; indexHovered=indexPhoto"
@@ -82,11 +75,11 @@
                          :style="imageStyles(weight, indexPhoto)">
                   <div v-if="activePhotoButtons === indexPhoto && isHovered===true">
                   <div class="left-side"
-                       @click="increaseWeight(photo_object.id, indexPhoto, weight)"></div>
+                       @click="increaseWeight(concept.id, indexPhoto, weight)"></div>
                   <div class="right-side"
-                       @click="decreaseWeight(photo_object.id, indexPhoto, weight)"></div>
+                       @click="decreaseWeight(concept.id, indexPhoto, weight)"></div>
                     <div class="delete-button">
-                      <button @click="deletePhoto(photo_object.id, indexPhoto)" type="button"
+                      <button @click="deletePhoto(concept.id, indexPhoto)" type="button"
                               class="btn btn-danger btn-sm float-right">
                               <i class="fas fa-times"></i>
                       </button>
@@ -96,46 +89,9 @@
                 </div>
             </div>
             </div>
-            <!--
-          <table class="table table-hover">
-            <thead>
-            <tr>
-              <th scope="col">ID</th>
-              <th scope="col">Concept</th>
-              <th scope="col">Photo</th>
-              <th scope="col">Weight</th>
-            </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(photo, index_photo) in photo_object.url" :key="index_photo">
-                <td>{{ index_photo }}</td>
-                <td>{{ photo_object.word }}</td>
-                <td>
-                  <div v-if="photo[1]===1">
-                    <img :src="photo[0]" alt="photo" width="100" height="100"></div>
-                  <div v-else-if="photo[1]===2">
-                    <img :src="photo[0]" alt="photo" width="200" height="200"></div>
-                  <div v-else-if="photo[1]===3">
-                    <img :src="photo[0]" alt="photo" width="300" height="300"></div>
-                  <div v-else-if="photo[1]===4">
-                    <img :src="photo[0]" alt="photo" width="400" height="400"></div>
-                  <div v-else-if="photo[1]===5">
-                    <img :src="photo[0]" alt="photo" width="500" height="500"></div>
-                    <p>{{ photo[1] }}</p>
-                </td>
-                <td>
-                  <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-info btn-sm" v-b-modal.weight-modal
-                    @click="editWeight(photo_object.id, index_photo)">Edit Weight</button>
-                    <button type="button" class="btn btn-danger btn-sm"
-                            @click="deletePhoto(photo_object.id, index_photo)">Delete</button>
-                  </div>
-                </td>
-            </tr>
-            </tbody>
-          </table>
-          -->
+            </div>
           </div>
+            </div>
         </div>
         <div>
           </div>
@@ -201,8 +157,7 @@ export default {
     return {
       isHovered: false,
       indexHovered: '',
-      photosPositive: [],
-      photosNegative: [],
+      concepts: [],
       addWordForm: {
         word: '',
       },
@@ -223,7 +178,7 @@ export default {
       const path = 'http://localhost:5000/photos';
       axios.get(path)
         .then((res) => {
-          this.photosPositive = res.data.photosPositive;
+          this.concepts = res.data.concepts;
         })
         .catch((err) => {
           console.error(err);
@@ -322,7 +277,6 @@ export default {
           this.getPhotos();
         });
     },
-
     // handle removal of the photos which don't fit
     removePhoto(photoObjectId, photoId) {
       const path = `http://localhost:5000/photos/${photoObjectId}/${photoId}`;
@@ -341,33 +295,6 @@ export default {
     deletePhoto(photoObjectId, photoId) {
       this.removePhoto(photoObjectId, photoId);
     },
-    // making styles for each photo
-    // imageStyles(weight, index_photo) {
-    //   return {
-    //     width: `${weight * 100}px`,
-    //     height: `${weight * 100}px`,
-    //     borderRadius: '1px',
-    //     ...(this.isHovered ? {
-    //       transform: 'scale(1.05)',
-    //       boxShadow: '5px 5px 10px #ccc',
-    //     } : {}),
-    //   };
-    // },
-    // imageStyles(weight, indexPhoto) {
-    //   // this.$refs[`img-${indexPhoto}`].style.width = `${weight * 10}px`;
-    //   // this.$refs[`img-${indexPhoto}`].style.height = `${weight * 10}px`;
-    //   //console.log(indexPhoto);
-    //   //this.changeOnHover(indexPhoto);
-    //   return {
-    //     width: `${weight * 100}px`,
-    //     height: `${weight * 100}px`,
-    //     borderRadius: '1px',
-    //     ...if (this.isHovered && this.indexHovered === indexPhoto){
-    //       transform = 'scale(1.05)';
-    //       boxShadow = '5px 5px 10px #ccc';
-    //   }
-    //   };
-    // },
     imageStyles(weight, indexPhoto) {
       const styles = {
         width: `${weight * 25 + 200}px`,
@@ -378,16 +305,9 @@ export default {
         styles.transform = 'scale(1.05)';
         styles.boxShadow = '5px 5px 10px #ccc';
         styles.transition = 'all .5s ease';
-        // styles.vertical-align = 'middle';
       }
       return styles;
     },
-    // changeOnHover(indexPhoto) {
-    //   if (this.isHovered && this.indexHovered === indexPhoto) {
-    //     this.$refs[`img-${indexPhoto}`].style.transform = 'scale(1.05)';
-    //     this.$refs[`img-${indexPhoto}`].style.boxShadow = '5px 5px 10px #ccc';
-    //   }
-    // },
   },
   computed: {
     activePhotoButtons() {
@@ -473,5 +393,8 @@ export default {
   position: absolute;
   top: 0;
   right: 0;
+}
+.photo-clusters {
+  display: inline;
 }
 </style>
