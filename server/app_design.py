@@ -1,4 +1,6 @@
 import uuid
+
+import cavlib
 from flask import Flask, url_for, request, redirect, jsonify
 from flask import render_template
 from pyunsplash import PyUnsplash
@@ -138,8 +140,14 @@ def concept(concept_id):
                 print(path)
                 os.makedirs(path, exist_ok=True)
                 print(path)
+                path_positive = os.path.join(path, 'positives')
+                path_negative = os.path.join(path, 'negatives')
+                os.makedirs(path_positive, exist_ok=True)
+                os.makedirs(path_negative, exist_ok=True)
                 for (key, value) in tqdm(concept.get('url_positive').items()):
-                     download_image(value[0], path, key)
+                     download_image(value[0], path_positive, key)
+                for (key, value) in tqdm(concept.get('url_negative').items()):
+                     download_image(value[0], path_negative, key)
                 CONCEPTS.remove(concept)
     if request.method == 'DELETE':
         for concept in CONCEPTS:
@@ -155,15 +163,22 @@ def download_image(url, file_path, file_name):
 
 
 def create_cav(images_dir):
-    images_dir = Path('examples/images')
-    my_cav = CAV.load('examples/roundness.cav')
-
-    for image in images_dir.iterdir():
-        print(image.name, my_cav.score(image))
+    pass
 
 @app.route('/designer/<concept_id>', methods=['GET', 'POST', 'DELETE'])
 def designerSide(concept_id):
-    pass
+    if request.method == 'GET':
+        concept_positives = Path('/Users/zhenyabudnyk/PycharmProjects/Designify/unsplash_pics/' + concept_id + '/positives')
+        concept_negatives = Path('/Users/zhenyabudnyk/PycharmProjects/Designify/unsplash_pics/' + concept_id + '/negatives')
+        positives = list(concept_positives.iterdir())
+        negatives = list(concept_negatives.iterdir())
+        concept_cav = cavlib.train_cav(positive_images=positives, negative_images=negatives, model_layer='googlenet_4d')
+        jpgs = Path('/Users/zhenyabudnyk/Documents/myProjects/mood-board-search/backend/static-cav-content/jpgs')
+        image_files = list(jpgs.iterdir())
+        sorted_images = concept_cav.sort(image_files, reverse=True)
+        print('top 3 images:', sorted_images[0:3])
+
+
 
 
 
