@@ -4,6 +4,7 @@ import Photos from '../components/Photos.vue';
 import Books from '../components/Books.vue';
 import Ping from '../components/Ping.vue';
 import ClientView from '../components/ClientView.vue';
+import DesignerView from '../components/DesignerView.vue';
 
 Vue.use(Router);
 
@@ -30,6 +31,11 @@ export default new Router({
       path: '/client',
       name: 'Client',
       component: ClientView,
+    },
+    {
+      path: '/designer',
+      name: 'Designer',
+      component: DesignerView,
     },
   ],
 });

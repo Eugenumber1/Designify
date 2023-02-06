@@ -48,6 +48,10 @@ CONCEPTS = [
     # }
 ]
 
+MOODBOARDS = [
+
+]
+
 
 # --------------- API -------------------
 
@@ -79,8 +83,7 @@ def home():
         for obj in s3_photos['Contents'][:31]:
             photo_negative = s3.generate_presigned_url(
                 ClientMethod="get_object",
-                Params={"Bucket": "brief-project-for-cm", "Key": obj["Key"]}
-            )
+                Params={"Bucket": "brief-project-for-cm", "Key": obj["Key"]})
             concept['url_negative'][uuid.uuid4().hex] = [photo_negative, parameter]
         print(len(concept['url_negative']))
         response_object['concepts'] = concept
@@ -149,6 +152,7 @@ def concept(concept_id):
                 for (key, value) in tqdm(concept.get('url_negative').items()):
                      download_image(value[0], path_negative, key)
                 CONCEPTS.remove(concept)
+                create_moodboard(concept_id)
     if request.method == 'DELETE':
         for concept in CONCEPTS:
             if concept.get('id') == concept_id:
@@ -160,27 +164,33 @@ def download_image(url, file_path, file_name):
     full_path = file_path + '/' + file_name + '.jpg'
     urllib.request.urlretrieve(url, full_path)
 
-
-
-def create_cav(images_dir):
-    pass
-
-@app.route('/designer/<concept_id>', methods=['GET', 'POST', 'DELETE'])
-def designerSide(concept_id):
+@app.route('/designer/moodboard', methods=['GET'])
+def designerSide():
+    response_object = {'status': 'success'}
     if request.method == 'GET':
-        concept_positives = Path('/Users/zhenyabudnyk/PycharmProjects/Designify/unsplash_pics/' + concept_id + '/positives')
-        concept_negatives = Path('/Users/zhenyabudnyk/PycharmProjects/Designify/unsplash_pics/' + concept_id + '/negatives')
-        positives = list(concept_positives.iterdir())
-        negatives = list(concept_negatives.iterdir())
-        concept_cav = cavlib.train_cav(positive_images=positives, negative_images=negatives, model_layer='googlenet_4d')
-        jpgs = Path('/Users/zhenyabudnyk/Documents/myProjects/mood-board-search/backend/static-cav-content/jpgs')
-        image_files = list(jpgs.iterdir())
-        sorted_images = concept_cav.sort(image_files, reverse=True)
-        print('top 3 images:', sorted_images[0:3])
+        response_object['moodboards'] = MOODBOARDS
+    return jsonify(response_object)
 
+def create_moodboard(concept_id):
+    sorted_images = create_cav(concept_id)
+    # print('top 3 images:', sorted_images[0:3])
+    moodboard = dict()
+    moodboard['id'] = concept_id
+    moodboard['urls'] = dict()
+    for image in sorted_images[0:101]:
+        moodboard['urls'][uuid.uuid4().hex] = str(image)
+    MOODBOARDS.append(moodboard)
 
-
-
+def create_cav(concept_id):
+    concept_positives = Path('/Users/zhenyabudnyk/PycharmProjects/Designify/unsplash_pics/' + concept_id + '/positives')
+    concept_negatives = Path('/Users/zhenyabudnyk/PycharmProjects/Designify/unsplash_pics/' + concept_id + '/negatives')
+    positives = list(concept_positives.iterdir())
+    negatives = list(concept_negatives.iterdir())
+    concept_cav = cavlib.train_cav(positive_images=positives, negative_images=negatives, model_layer='googlenet_4d')
+    jpgs = Path('/Users/zhenyabudnyk/Documents/myProjects/mood-board-search/backend/static-cav-content/jpgs')
+    image_files = list(jpgs.iterdir())
+    sorted_images = concept_cav.sort(image_files, reverse=True)
+    return sorted_images
 
 
 

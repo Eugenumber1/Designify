@@ -5,39 +5,17 @@
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@4.5.2/dist/darkly/bootstrap.min.css" integrity="sha384-B4morbeopVCSpzeC1c4nyV0d0cqvlSAfyXVfrPJa25im5p+yEN/YmhlgQP/OyMZD" crossorigin="anonymous">
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
       <div class="row">
-        <h1 class="text-center text-uppercase text-black">
-          Describe your Brand
-        </h1>
+
         <div class="col-sm-12">
           <hr><br>
           <!-- Alert message -->
-          <b-alert variant="success" v-if="showMessage" show> {{ message }} </b-alert>
           <div class="text-md-left">
-          <h2>Process</h2>
-              <p>Tell us with which values you truly identify your brand with and our AI will create
-                several mood boards to help the designer better understand your brand.</p>
-            </div>
-          <input type="text" v-model="addWordForm.word">
-          <button type="button" class="btn btn-primary btn-sm " @click="onSubmit">
-            Tell us the Concept!</button>
-
-          <br><br>
-          <div class="one-concept">
-          <div  v-for="(concept, index_object) in concepts" :key="index_object">
-            <h2>The Word with which you associate your brand is: {{ concept.word }}</h2>
-            <p> Change the weights of the photos or
-              delete those which don't visually fit into your concept </p>
-            <h3>When you are ready, and all
-              photos ideally describe your brand - submit them to our AI</h3>
-            <button type="button" class="btn btn-primary"
-                    @click="sendConcept(concept.id)">
-            Submit Concept</button>
-            <button type="button" class="btn btn-danger"
-                    @click="resetConcept(concept.id)">
-            Reset Concept</button>
-          <div v-for="(concept, index) in concepts" :key="index">
+            <h1>Moodboard Photos</h1>
+            <div class="moodboards">
+              <div  v-for="(moodboard, index_object) in moodboards" :key="index_object">
+          <div v-for="(moodboard, index) in moodboards" :key="index">
             <div class="photo-clusters">
-            <div v-for="([source, weight], indexPhoto) in concept.url_positive"
+            <div v-for="(source, indexPhoto) in moodboard.urls"
                  :key="indexPhoto"
             class="grid-container">
               <div @mouseenter="isHovered = true; indexHovered=indexPhoto"
@@ -46,105 +24,26 @@
                     <img :src="source"
                          alt="photo"
                          class="img-thumbnail grid-container"
-                         :style="imageStyles(weight, indexPhoto)">
-                  <div v-if="activePhotoButtons === indexPhoto && isHovered===true">
-                  <div class="left-side"
-                       @click="increaseWeight(concept.id, indexPhoto, weight)"></div>
-                  <div class="right-side"
-                       @click="decreaseWeight(concept.id, indexPhoto, weight)"></div>
+                         :style="imageStyles(indexPhoto)">
                     <div class="delete-button">
-                      <button @click="deletePhoto(concept.id, indexPhoto)" type="button"
+                      <button @click="deletePhoto(moodboard.id, indexPhoto)" type="button"
                               class="btn btn-danger btn-sm float-right">
                               <i class="fas fa-times"></i>
                       </button>
-                    </div>
-                    </div>
-                  </div>
-                </div>
-            </div>
-            <!--Here we have the photos with which the user doesn't associate his
-            brand, mostly random ones -->
-              <h2>Photos with Which you don't associate your brand!</h2>
-            <div v-for="([source, weight], indexPhoto) in concept.url_negative"
-                 :key="indexPhoto"
-            class="grid-container">
-              <div @mouseenter="isHovered = true; indexHovered=indexPhoto"
-                    @mouseleave="isHovered = false; indexHovered=null">
-                <div class="picture" >
-                    <img :src="source"
-                         alt="photo"
-                         class="img-thumbnail grid-container"
-                         :style="imageStyles(weight, indexPhoto)">
-                  <div v-if="activePhotoButtons === indexPhoto && isHovered===true">
-                  <div class="left-side"
-                       @click="increaseWeight(concept.id, indexPhoto, weight)"></div>
-                  <div class="right-side"
-                       @click="decreaseWeight(concept.id, indexPhoto, weight)"></div>
-                    <div class="delete-button">
-                      <button @click="deletePhoto(concept.id, indexPhoto)" type="button"
-                              class="btn btn-danger btn-sm float-right">
-                              <i class="fas fa-times"></i>
-                      </button>
-                    </div>
                     </div>
                   </div>
                 </div>
             </div>
             </div>
             </div>
-          </div>
-            </div>
+          <br><br>
         </div>
         <div>
           </div>
       </div>
-      <!-- Modal -->
-      <b-modal ref="addWordModal"
-                   id="word-modal"
-                   title="Add a new word"
-                   hide-footer>
-      <b-form @submit="onSubmit" class="w-100">
-      <b-form-group id="form-title-group"
-                    label="Title:"
-                    label-for="form-title-input">
-          <b-form-input id="form-title-input"
-                        type="text"
-                        v-model="addWordForm.word"
-                        required
-                        placeholder="Enter title">
-          </b-form-input>
-        </b-form-group>
-        <b-button-group>
-          <b-button type="submit" variant="primary">
-            Submit
-          </b-button>
-        </b-button-group>
-      </b-form>
-    </b-modal>
-      <!-- Modal 2 -->
-      <b-modal ref="editWeightModal"
-                   id="weight-modal"
-                   title="Update the Weight"
-                   hide-footer hide-backdrop>
-      <b-form @submit="onSubmitUpdate" class="w-100">
-      <b-form-group id="form-weight-edit-group"
-                    label="Title:"
-                    label-for="form-weight-edit-input">
-          <b-form-input id="form-weight-input"
-                        type="text"
-                        v-model="editForm.weight"
-                        required
-                        placeholder="Enter the Weight from 1 to 5">
-          </b-form-input>
-        </b-form-group>
-        <b-button-group>
-          <b-button type="submit" variant="primary">
-            Submit
-          </b-button>
-        </b-button-group>
-      </b-form>
-    </b-modal>
-      <!-- Modal 2 end -->
+    </div>
+  </div>
+      </div>
     </div>
   </div>
 
@@ -152,14 +51,13 @@
 
 <script>
 import axios from 'axios';
-import { BModal } from 'bootstrap-vue';
 
 export default {
   data() {
     return {
       isHovered: false,
       indexHovered: '',
-      concepts: [],
+      moodboards: [],
       addWordForm: {
         word: '',
       },
@@ -170,17 +68,13 @@ export default {
       },
     };
   },
-  message: '',
-  components: {
-    BModal,
-  },
   methods: {
     // get function
-    getPhotos() {
-      const path = 'http://localhost:5000/photos';
+    getMoodboards() {
+      const path = 'http://localhost:5000/designer/moodboard';
       axios.get(path)
         .then((res) => {
-          this.concepts = res.data.concepts;
+          this.moodboards = res.data.moodboards;
         })
         .catch((err) => {
           console.error(err);
@@ -207,7 +101,7 @@ export default {
     },
     onSubmit(evt) {
       evt.preventDefault();
-      // this.$bvModal.hide('word-modal');
+      this.$bvModal.hide('word-modal');
       const payLoad = {
         word: this.addWordForm.word,
       };
@@ -297,10 +191,10 @@ export default {
     deletePhoto(photoObjectId, photoId) {
       this.removePhoto(photoObjectId, photoId);
     },
-    imageStyles(weight, indexPhoto) {
+    imageStyles(indexPhoto) {
       const styles = {
-        width: `${weight * 25 + 200}px`,
-        height: `${weight * 25 + 200}px`,
+        width: `${300}px`,
+        height: `${300}px`,
         borderRadius: '1px',
       };
       if (this.isHovered && this.indexHovered === indexPhoto) {
@@ -317,7 +211,7 @@ export default {
     },
   },
   created() {
-    this.getPhotos();
+    this.getMoodboards();
   },
 };
 </script>
