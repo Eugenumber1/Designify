@@ -178,7 +178,14 @@ def create_moodboard(concept_id):
     moodboard['id'] = concept_id
     moodboard['urls'] = dict()
     for image in sorted_images[0:101]:
-        moodboard['urls'][uuid.uuid4().hex] = str(image)
+        image = str(image) if isinstance(image, Path) else image
+        s3.upload_file('brief-project-for-cm', 'designer-view/'+str(image), image)
+        moodboard['urls'][uuid.uuid4().hex] = s3.generate_presigned_url(
+            ClientMethod='get_object',
+            Params={
+                'Bucket': 'brief-project-for-cm',
+                'Key': 'designer-view/' + str(image)
+            },)
     MOODBOARDS.append(moodboard)
 
 def create_cav(concept_id):
@@ -191,6 +198,8 @@ def create_cav(concept_id):
     image_files = list(jpgs.iterdir())
     sorted_images = concept_cav.sort(image_files, reverse=True)
     return sorted_images
+
+
 
 
 
