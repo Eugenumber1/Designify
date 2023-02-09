@@ -52,6 +52,8 @@ MOODBOARDS = [
 
 ]
 
+CAVs = {}
+
 
 # --------------- API -------------------
 
@@ -63,7 +65,7 @@ def home():
     if request.method == "POST":
         post_data = request.get_json()
         word = post_data.get('word')
-        search = py_un.search(type_='photos', per_page=15, query=word)
+        search = py_un.search(type_='photos', per_page=50, query=word)
         photos = list()
         #print(type(search))
         for entry in search.entries:
@@ -80,7 +82,7 @@ def home():
         for photo_positive in photos:
             concept['url_positive'][uuid.uuid4().hex] = [photo_positive, parameter]
         random.shuffle(s3_photos['Contents'])
-        for obj in s3_photos['Contents'][:31]:
+        for obj in s3_photos['Contents'][:51]:
             photo_negative = s3.generate_presigned_url(
                 ClientMethod="get_object",
                 Params={"Bucket": "brief-project-for-cm", "Key": obj["Key"]})
@@ -139,18 +141,25 @@ def concept(concept_id):
             if concept.get('id') == concept_id:
                 parent = '/Users/zhenyabudnyk/PycharmProjects/Designify/unsplash_pics'
                 directory = concept_id
+                CAVs[concept_id] = dict()
                 path = os.path.join(parent, directory)
                 print(path)
                 os.makedirs(path, exist_ok=True)
                 print(path)
                 path_positive = os.path.join(path, 'positives')
+                CAVs[concept_id]['positives'] = list()
                 path_negative = os.path.join(path, 'negatives')
+                CAVs[concept_id]['negatives'] = list()
                 os.makedirs(path_positive, exist_ok=True)
                 os.makedirs(path_negative, exist_ok=True)
                 for (key, value) in tqdm(concept.get('url_positive').items()):
-                     download_image(value[0], path_positive, key)
+                    full_path = path_positive + '/' + key + '.jpg'
+                    CAVs[concept_id]['positives'].append(cavlib.TrainingImage(full_path, weight=value[1]))
+                    download_image(value[0], full_path)
                 for (key, value) in tqdm(concept.get('url_negative').items()):
-                     download_image(value[0], path_negative, key)
+                    full_path = path_negative + '/' + key + '.jpg'
+                    download_image(value[0], full_path)
+                    CAVs[concept_id]['negatives'].append(cavlib.TrainingImage(full_path, weight=value[1]))
                 CONCEPTS.remove(concept)
                 create_moodboard(concept_id)
     if request.method == 'DELETE':
@@ -160,8 +169,7 @@ def concept(concept_id):
     return jsonify(response_object)
 
 
-def download_image(url, file_path, file_name):
-    full_path = file_path + '/' + file_name + '.jpg'
+def download_image(url, full_path):
     urllib.request.urlretrieve(url, full_path)
 
 @app.route('/designer/moodboard', methods=['GET'])
@@ -190,10 +198,13 @@ def create_moodboard(concept_id):
     MOODBOARDS.append(moodboard)
 
 def create_cav(concept_id):
-    concept_positives = Path('/Users/zhenyabudnyk/PycharmProjects/Designify/unsplash_pics/' + concept_id + '/positives')
-    concept_negatives = Path('/Users/zhenyabudnyk/PycharmProjects/Designify/unsplash_pics/' + concept_id + '/negatives')
-    positives = list(concept_positives.iterdir())
-    negatives = list(concept_negatives.iterdir())
+    # concept_positives = Path('/Users/zhenyabudnyk/PycharmProjects/Designify/unsplash_pics/' + concept_id + '/positives')
+    # concept_negatives = Path('/Users/zhenyabudnyk/PycharmProjects/Designify/unsplash_pics/' + concept_id + '/negatives')
+    # positives = list(concept_positives.iterdir())
+    # negatives = list(concept_negatives.iterdir())
+    concept = CAVs.get(concept_id)
+    positives = concept.get('positives')
+    negatives = concept.get('negatives')
     concept_cav = cavlib.train_cav(positive_images=positives, negative_images=negatives, model_layer='googlenet_4d')
     jpgs = Path('/Users/zhenyabudnyk/Documents/myProjects/mood-board-search/backend/static-cav-content/jpgs')
     image_files = list(jpgs.iterdir())
