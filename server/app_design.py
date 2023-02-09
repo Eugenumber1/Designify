@@ -173,13 +173,14 @@ def designerSide():
 
 def create_moodboard(concept_id):
     sorted_images = create_cav(concept_id)
-    # print('top 3 images:', sorted_images[0:3])
+    print('top 3 images:', sorted_images[0:3])
     moodboard = dict()
     moodboard['id'] = concept_id
     moodboard['urls'] = dict()
     for image in sorted_images[0:101]:
-        image = str(image) if isinstance(image, Path) else image
-        s3.upload_file('brief-project-for-cm', 'designer-view/'+str(image), image)
+        # image = str(image) if isinstance(image, Path) else image
+        # with open(image, 'rb') as data:
+        s3.upload_file(str(image), 'brief-project-for-cm', 'designer-view/'+str(image))
         moodboard['urls'][uuid.uuid4().hex] = s3.generate_presigned_url(
             ClientMethod='get_object',
             Params={
