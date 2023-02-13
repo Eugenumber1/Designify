@@ -78,7 +78,7 @@ def home():
         #print(photo_object['word'])
         concept['url_positive'] = dict()
         concept['url_negative'] = dict()
-        parameter = 3
+        parameter = 1
         for photo_positive in photos:
             concept['url_positive'][uuid.uuid4().hex] = [photo_positive, parameter]
         random.shuffle(s3_photos['Contents'])
@@ -205,7 +205,7 @@ def create_cav(concept_id):
     concept = CAVs.get(concept_id)
     positives = concept.get('positives')
     negatives = concept.get('negatives')
-    concept_cav = cavlib.train_cav(positive_images=positives, negative_images=negatives, model_layer='googlenet_4d')
+    concept_cav = cavlib.train_cav(positive_images=positives, negative_images=negatives, model_layer='googlenet_5b')
     jpgs = Path('/Users/zhenyabudnyk/Documents/myProjects/mood-board-search/backend/static-cav-content/jpgs')
     image_files = list(jpgs.iterdir())
     sorted_images = concept_cav.sort(image_files, reverse=True)

@@ -299,8 +299,8 @@ export default {
     },
     imageStyles(weight, indexPhoto) {
       const styles = {
-        width: `${weight * 25 + 200}px`,
-        height: `${weight * 25 + 200}px`,
+        width: `${weight * 50 + 200}px`,
+        height: `${weight * 50 + 200}px`,
         borderRadius: '1px',
       };
       if (this.isHovered && this.indexHovered === indexPhoto) {
