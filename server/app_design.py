@@ -12,6 +12,9 @@ from pathlib import Path
 from tqdm import tqdm
 import boto3
 import random
+from PIL import Image, UnidentifiedImageError
+import numpy as np
+import cv2 as cv
 
 
 
@@ -206,9 +209,22 @@ def create_cav(concept_id):
     positives = concept.get('positives')
     negatives = concept.get('negatives')
     concept_cav = cavlib.train_cav(positive_images=positives, negative_images=negatives, model_layer='googlenet_5b')
-    jpgs = Path('/Users/zhenyabudnyk/Documents/myProjects/mood-board-search/backend/static-cav-content/jpgs')
+    jpgs = Path('/Users/zhenyabudnyk/PycharmProjects/flickr_scraper/images/abstract')
     image_files = list(jpgs.iterdir())
-    sorted_images = concept_cav.sort(image_files, reverse=True)
+    for i, image in enumerate(image_files):
+        try:
+            pil_image = Image.open(image)
+        except UnidentifiedImageError:
+            os.remove(str(image))
+            print("deleted" + str(i))
+
+
+
+    jpgs = Path('/Users/zhenyabudnyk/PycharmProjects/flickr_scraper/images/abstract')
+    image_files = list(jpgs.iterdir())
+
+    sorted_images = concept_cav.sort(image_files[:101], reverse=True)
+
     return sorted_images
 
 
