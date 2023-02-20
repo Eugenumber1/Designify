@@ -15,6 +15,7 @@ import random
 from PIL import Image, UnidentifiedImageError
 import numpy as np
 import cv2 as cv
+import config
 
 
 
@@ -27,13 +28,11 @@ DEBUG = True
 app = Flask(__name__)
 # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # app.config['SECRET_KEY'] = 'you-will-never-guess'
-api_key = 'mJpXOSabo4pvepg4JaPEOMhBWUxmS86hQIvueQQezx4'
+api_key = config.api_key
 app.config.from_object(__name__)
 py_un = PyUnsplash(api_key=api_key)
 CORS(app, resources={r'/*': {'origins': '*'}})
-s3 = boto3.client('s3', aws_access_key_id='AKIA4TY6Y5CRV7VPBSMD',
-                  aws_secret_access_key='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', region_name='eu-central-1',
-                  config=boto3.session.Config(signature_version='s3v4',))
+s3 = config.s3
 
 # ------------RESOURCES------------
 
@@ -63,7 +62,7 @@ CAVs = {}
 
 @app.route('/photos', methods=['POST', 'GET'])  # url for my app
 def home():
-    s3_photos = s3.list_objects_v2(Bucket="brief-project-for-cm", Prefix="jpgs/")
+    s3_photos = s3.list_objects_v2(Bucket="brief-project-for-cm", Prefix="negatives20/")
     response_object = {'status': 'success'}
     if request.method == "POST":
         post_data = request.get_json()
@@ -208,6 +207,9 @@ def create_cav(concept_id):
     concept = CAVs.get(concept_id)
     positives = concept.get('positives')
     negatives = concept.get('negatives')
+
+    # negatives =
+    roundness = CAV.load("/Users/zhenyabudnyk/Documents/myProjects/mood-board-search/cavlib/examples/roundness.cav")
     concept_cav = cavlib.train_cav(positive_images=positives, negative_images=negatives, model_layer='googlenet_5b')
     jpgs = Path('/Users/zhenyabudnyk/PycharmProjects/flickr_scraper/images/abstract')
     image_files = list(jpgs.iterdir())
@@ -221,9 +223,10 @@ def create_cav(concept_id):
 
 
     jpgs = Path('/Users/zhenyabudnyk/PycharmProjects/flickr_scraper/images/abstract')
+    pngs = Path('/Users/zhenyabudnyk/Documents/myProjects/mood-board-search/backend/static-cav-content/jpgs')
     image_files = list(jpgs.iterdir())
 
-    sorted_images = concept_cav.sort(image_files[:101], reverse=True)
+    sorted_images = roundness.sort(image_files[:101], reverse=True)
 
     return sorted_images
 
